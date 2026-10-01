@@ -102,25 +102,12 @@ namespace WeatherApiPlaywrightTest
         // Read our input data from a csv file into an array of WeatherApiItem.
         private static WeatherApiItem[] GetApiTestItems()
         {
-            using (StreamReader sr = new("weather_loc_input.csv"))
-            {
-                Boolean first_line = true;
-                string? line;
-                List<WeatherApiItem> retList = [];
-                while((line = sr.ReadLine()) != null)
-                {
-                    // ignore the header line (first line)
-                    if (first_line)
-                    {
-                        first_line = false;
-                        continue;
-                    }
-
-                    retList.Add(new WeatherApiItem(line));
-                }
-
-                return [.. retList];
-            }
+            var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "weather_loc_input.csv");
+            return File.ReadLines(path)
+                .Skip(1)   // skip the header
+                .Where(l => !string.IsNullOrWhiteSpace(l))
+                .Select(l => new WeatherApiItem(l))
+                .ToArray();
         }
     }
 }
